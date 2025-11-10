@@ -1,8 +1,16 @@
-import React from "react";
 import ExpensesForm from "../components/ExpensesForm";
 import IncomeForm from "../components/IncomeForm";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
 
 const Transaction = () => {
+  const expenses = useSelector((state) => state.expenses);
+  const incomes = useSelector((state) => state.incomes);
+
+  useEffect(() => {
+    localStorage.setItem("expenses", JSON.stringify(expenses));
+    localStorage.setItem("incomes", JSON.stringify(incomes));
+  }, [expenses, incomes]);
   return (
     <div className="space-y-8">
       <div className="text-center">

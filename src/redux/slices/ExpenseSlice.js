@@ -8,12 +8,10 @@ export const ExpenseSlice = createSlice({
   reducers: {
     addExpense(state, action) {
       state.push(action.payload);
-      localStorage.setItem("expenses", JSON.stringify(state));
     },
     removeExpense(state, action) {
-      const updated = state.filter((item) => item.id !== action.payload);
-      localStorage.setItem("expenses", JSON.stringify(updated));
-      return updated;
+      return state.filter((item) => item.id !== action.payload);
+     
     },
   },
 });

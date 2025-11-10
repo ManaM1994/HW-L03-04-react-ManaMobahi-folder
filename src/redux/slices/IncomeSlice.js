@@ -8,12 +8,9 @@ export const IncomeSlice = createSlice({
   reducers: {
     addIncome(state, action) {
       state.push(action.payload);
-      localStorage.setItem("incomes", JSON.stringify(state));
     },
     deleteIncome(state, action) {
-      const updatedList = state.filter((item) => item.id !== action.payload);
-      localStorage.setItem("incomes", JSON.stringify(updatedList));
-      return updatedList;
+      return state.filter((item) => item.id !== action.payload);
     },
   },
 });
