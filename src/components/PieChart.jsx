@@ -7,8 +7,9 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useSelector } from "react-redux";
+import { useState } from "react";
+import { useEffect } from "react";
 
-// #endregion
 const RADIAN = Math.PI / 180;
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#AF19FF"];
 
@@ -48,6 +49,13 @@ export default function PieChartWithCustomizedLabel({
   const expenses = useSelector((state) => state.expenses);
   const data = [];
   const categoryMap = {};
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   expenses.forEach((expense) => {
     if (categoryMap[expense.category]) {
@@ -56,7 +64,6 @@ export default function PieChartWithCustomizedLabel({
       categoryMap[expense.category] = expense.amount;
     }
   });
-  console.log("categories", categoryMap);
 
   for (const category in categoryMap) {
     data.push({ name: category, value: categoryMap[category] });
@@ -86,13 +93,11 @@ export default function PieChartWithCustomizedLabel({
           </Pie>
           <Tooltip formatter={(value) => [`$${value}`, "Amount"]} />
           <Legend
-            layout={window.innerWidth <= 768 ? "horizontal" : "vertical"}
-            align={window.innerWidth <= 768 ? "center" : "right"}
-            verticalAlign={window.innerWidth <= 768 ? "bottom" : "middle"}
+            layout={isMobile ? "horizontal" : "vertical"}
+            align={isMobile ? "center" : "right"}
+            verticalAlign={isMobile ? "bottom" : "middle"}
             iconType="circle"
-            wrapperStyle={
-              window.innerWidth <= 768 ? { paddingTop: "20px" } : {}
-            }
+            wrapperStyle={isMobile ? { paddingTop: "20px" } : {}}
           />
         </PieChart>
       </ResponsiveContainer>

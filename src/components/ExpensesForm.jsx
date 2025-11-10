@@ -1,20 +1,53 @@
 import { useState } from "react";
 import Title from "./Title";
-import MainInput from "./MainInput";
-import MainButton from "./MainButton";
-import CategorySelect from "./CategorySelect";
 import { expeseActions } from "../redux/slices/ExpenseSlice";
-import { useDispatch } from "react-redux";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import ExpenseForm from "./ExpenseForm";
+import ExpenseFilters from "./ExpenseFilters";
+import ExpenseTable from "./ExpenseTable";
 
 const ExpensesForm = () => {
   const dispatch = useDispatch();
   const expenses = useSelector((state) => state.expenses);
 
+  // Form state
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState("");
   const [category, setCategory] = useState("");
+
+  // Filter state
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [searchItem, setSearchItem] = useState("");
+  const [filteredCategory, setFilteredCategory] = useState("all");
+
+  let filteredExpenses = expenses;
+
+  if (filteredCategory && filteredCategory !== "all") {
+    filteredExpenses = filteredExpenses.filter(
+      (expense) => expense.category === filteredCategory
+    );
+  }
+  if (startDate) {
+    filteredExpenses = filteredExpenses.filter((expense) => {
+      if (!expense.date) return false;
+      return new Date(expense.date) >= new Date(startDate);
+    });
+  }
+  if (endDate) {
+    filteredExpenses = filteredExpenses.filter((expense) => {
+      if (!expense.date) return false;
+      return new Date(expense.date) <= new Date(endDate);
+    });
+  }
+
+  const searchResult = filteredExpenses?.filter((expense) => {
+    return (
+      expense.title.toLowerCase().includes(searchItem.toLowerCase()) ||
+      expense.amount.toString().includes(searchItem)
+    );
+  });
 
   const handleAddExpense = () => {
     const newExpense = {
@@ -25,88 +58,52 @@ const ExpensesForm = () => {
       category,
     };
     dispatch(expeseActions.addExpense(newExpense));
+    setTitle("");
+    setAmount("");
+    setDate("");
+    setCategory("");
+  };
+
+  const handleDeleteExpense = (id) => {
+    dispatch(expeseActions.removeExpense(id));
+  };
+
+  const handleClearFilters = () => {
+    setStartDate("");
+    setEndDate("");
+    setSearchItem("");
+    setFilteredCategory("all");
   };
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
       <Title text="Enter your expenses" />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <MainInput label="Title" value={title} onChange={setTitle} />
-        <MainInput
-          label="Amount"
-          type="number"
-          value={amount}
-          onChange={setAmount}
-          InputProps={{
-            startAdornment: "$",
-          }}
-        />
-        <MainInput
-          type="date"
-          label=""
-          value={date}
-          onChange={setDate}
-          InputLabelProps={{
-            shrink: true,
-          }}
-        />
-        <CategorySelect value={category} onChange={setCategory} />
-      </div>
-      <div className="mb-8">
-        <MainButton label="Add Expense" onClick={handleAddExpense} />
-      </div>
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Title
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Amount
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Date
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Category
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {expenses.map((expense) => (
-              <tr key={expense.id}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {expense.title}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  ${expense.amount}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {expense.date}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {expense.category}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {" "}
-                  <button
-                    onClick={() => {
-                      dispatch(expeseActions.removeExpense(expense.id));
-                    }}
-                  >
-                    delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <ExpenseForm
+        title={title}
+        setTitle={setTitle}
+        amount={amount}
+        setAmount={setAmount}
+        date={date}
+        setDate={setDate}
+        category={category}
+        setCategory={setCategory}
+        onSubmit={handleAddExpense}
+      />
+
+      <ExpenseFilters
+        searchItem={searchItem}
+        setSearchItem={setSearchItem}
+        startDate={startDate}
+        setStartDate={setStartDate}
+        endDate={endDate}
+        setEndDate={setEndDate}
+        filteredCategory={filteredCategory}
+        setFilteredCategory={setFilteredCategory}
+        onClearFilters={handleClearFilters}
+      />
+
+      <ExpenseTable expenses={searchResult} onDelete={handleDeleteExpense} />
     </div>
   );
 };

@@ -10,6 +10,11 @@ export const IncomeSlice = createSlice({
       state.push(action.payload);
       localStorage.setItem("incomes", JSON.stringify(state));
     },
+    deleteIncome(state, action) {
+      const updatedList = state.filter((item) => item.id !== action.payload);
+      localStorage.setItem("incomes", JSON.stringify(updatedList));
+      return updatedList;
+    },
   },
 });
 

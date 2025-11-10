@@ -58,14 +58,12 @@ const CategorySelect = ({ value, onChange }) => {
         label: customCategory.trim(),
       };
 
-      // Save to localStorage
       const savedCategories = JSON.parse(
         localStorage.getItem("customCategories") || "[]"
       );
       savedCategories.push(newCategory);
       localStorage.setItem("customCategories", JSON.stringify(savedCategories));
 
-      // Update state
       setCategories([...defaultCategories, ...savedCategories]);
       onChange(newCategory.value);
       handleClose();

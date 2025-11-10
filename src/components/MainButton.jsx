@@ -1,12 +1,12 @@
 import { Button } from "@mui/material";
 
-const MainButton = ({ label, onClick }) => {
+const MainButton = ({ label, onClick, color = "primary", size = "large" }) => {
   return (
     <Button
       variant="contained"
-      color="primary"
+      color={color}
       onClick={() => onClick()}
-      size="large"
+      size={size}
     >
       {label}
     </Button>

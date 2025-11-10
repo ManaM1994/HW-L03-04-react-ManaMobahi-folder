@@ -11,8 +11,9 @@ export const ExpenseSlice = createSlice({
       localStorage.setItem("expenses", JSON.stringify(state));
     },
     removeExpense(state, action) {
-      state.filter((item) => item.id !== action.payload);
-      localStorage.setItem("expenses", JSON.stringify(state));
+      const updated = state.filter((item) => item.id !== action.payload);
+      localStorage.setItem("expenses", JSON.stringify(updated));
+      return updated;
     },
   },
 });
